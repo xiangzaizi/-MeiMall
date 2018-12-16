@@ -165,3 +165,54 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# 日志配置
+LOGGING = {
+    'version': 1,
+    # 是否要禁用其他的日志功能，False表示不禁用
+    'disable_existing_loggers': False,
+    # 日志输出时的格式
+    'formatters': {
+        # 详细
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(lineno)d %(message)s'
+        },
+        # 简单
+        'simple': {
+            'format': '%(levelname)s %(module)s %(lineno)d %(message)s'
+        },
+    },
+    # 日志过滤器
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    # 日志处理方式
+    'handlers': {
+        # 终端
+        'console': {
+            'level': 'DEBUG',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        # 文件
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(os.path.dirname(BASE_DIR), "logs/meiduo.log"),  # 日志文件的位置
+            'maxBytes': 300 * 1024 * 1024,
+            'backupCount': 10,
+            'formatter': 'verbose'
+        },
+    },
+    # 日志器[处理日志的对象配置]
+    'loggers': {
+        'meiduo': {  # 定义了一个名为django的日志器
+            'handlers': ['console', 'file'],
+            # 是否要把当前日志向上一级传递
+            'propagate': True,
+        },
+    }
+}
