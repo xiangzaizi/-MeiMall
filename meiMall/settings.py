@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # 注册模块
-    'users.apps.UsersConfig',  # 用户模块
+    'apps.users.apps.UsersConfig',  # 用户模块
 
 
     # 注册rest_framework应用
