@@ -9,6 +9,7 @@ import random
 
 from apps.verifications.serializers import ImageCodeCheckSerializer
 from libs.captcha.captcha import captcha
+from libs.yuntongxun.sms import CCP
 from . import constants
 
 # /image_code/uuid
@@ -59,6 +60,9 @@ class SMSCodeView(GenericAPIView):
         pl.execute()  # 把上面组装的操作一并执行
 
         # 4. 发送短信
+        ccp = CCP()
+        time = str(constants.SMS_CODE_REDIS_EXPIRES/60)
+        ccp.send_template_sms(mobile, [sms_code, time], constants.SMS_TEMP_ID)
 
         # 5. 返回响应
         return Response({"message": "OK"}, status.HTTP_200_OK)
