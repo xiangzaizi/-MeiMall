@@ -216,3 +216,10 @@ LOGGING = {
         },
     }
 }
+
+
+# 重新设置DRF框架中的异常处理机制
+REST_FRAMEWORK = {
+    # 指定异常处理的函数
+    'EXCEPTION_HANDLER': 'meiduo_mall.utils.exceptions.exception_handler',
+}
