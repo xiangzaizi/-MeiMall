@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     # 注册模块
     'apps.users.apps.UsersConfig',  # 用户模块
     'apps.areas.apps.AreasConfig',  # 行政区域模块
+    'apps.verifications.apps.VerificationsConfig',  # 验证码校验模块
 
     # 注册rest_framework应用
     'rest_framework',
@@ -107,17 +108,25 @@ DATABASES = {
 
 # 配置redis数据库
 CACHES = {
-"default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6385/0",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        }
-    },
+    "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": "redis://127.0.0.1:6385/0",
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            }
+        },
     # 配置给admin运营后台，不是给前台商城的，前台商城到时使用另一种方式保存用户登陆信息
     "session": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": "redis://127.0.0.1:6385/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
+    # 配置验证码--->单独配置库存储验证码
+    "verify_codes": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6385/2",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
@@ -221,7 +230,7 @@ LOGGING = {
 # 重新设置DRF框架中的异常处理机制
 REST_FRAMEWORK = {
     # 指定异常处理的函数
-    'EXCEPTION_HANDLER': 'meiduo_mall.utils.exceptions.exception_handler',
+    'EXCEPTION_HANDLER': 'utils.exceptions.exception_handler',
 }
 
 # 修改默认配置的用户模型类
