@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_redis import get_redis_connection
 from rest_framework import status
+import random
 
 from apps.verifications.serializers import ImageCodeCheckSerializer
 from libs.captcha.captcha import captcha
@@ -42,8 +43,20 @@ class SMSCodeView(GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         # 2. 生成短信验证码
+        sms_code = "%06d" % random.randint(0, 999999)
 
         # 3. 保存短信验证码与发送记录
+        redis_conn = get_redis_connection('verify_codes')
+        # 当项目中连续出现多条操作redis的语句时，可以使用pipeline管道命令，把多条操作
+        # 组合到一次发送给redis，可以有效提高执行效率
+        # 通过pipeline方法，获取管道对象，管道对象继承于redis连接对象
+        # 所以redis中本身支持方法属性，pipeline对象也可以操作
+        pl = redis_conn.pipeline()
+        pl.multi()
+        pl.setex("sms_%s" % mobile, constants.SMS_CODE_REDIS_EXPIRES, sms_code)
+        # 发送短信的标志，维护60秒
+        pl.setex("send_flag_%s" % mobile, constants.SEND_SMS_CODE_INTERVAL, 1)
+        pl.execute()  # 把上面组装的操作一并执行
 
         # 4. 发送短信
 
