@@ -223,3 +223,6 @@ REST_FRAMEWORK = {
     # 指定异常处理的函数
     'EXCEPTION_HANDLER': 'meiduo_mall.utils.exceptions.exception_handler',
 }
+
+# 修改默认配置的用户模型类
+AUTH_USER_MODEL = 'users.User'
