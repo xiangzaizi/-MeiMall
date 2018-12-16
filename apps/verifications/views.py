@@ -1,8 +1,12 @@
 from django.http.response import HttpResponse
 from django.shortcuts import render
+from rest_framework.generics import GenericAPIView
+from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_redis import get_redis_connection
+from rest_framework import status
 
+from apps.verifications.serializers import ImageCodeCheckSerializer
 from libs.captcha.captcha import captcha
 from . import constants
 
@@ -24,4 +28,28 @@ class ImageCodeView(APIView):
 
         # 3. 响应返回图片
         return HttpResponse(image, content_type="images/jpg")
+
+
+class SMSCodeView(GenericAPIView):
+    # GenericAPIView 可以声明当前类的序列化器
+    """短信验证码"""
+    # 声明当前视图类的序列化器,直接拿序列化器中的序列化器
+    # GET /sms_code/(?P<mobile>.+)/?image_code
+    serializer_class = ImageCodeCheckSerializer
+    def get(self, request, mobile):
+        # 1. 在序列化器中 检查图片验证码
+        serializer = self.get_serializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+
+        # 2. 生成短信验证码
+
+        # 3. 保存短信验证码与发送记录
+
+        # 4. 发送短信
+
+        # 5. 返回响应
+        return Response({"message": "OK"}, status.HTTP_200_OK)
+
+
+
 
