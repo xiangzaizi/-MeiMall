@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # 注册模块
     'apps.users.apps.UsersConfig',  # 用户模块
-
+    'apps.areas.apps.AreasConfig',  # 行政区域模块
 
     # 注册rest_framework应用
     'rest_framework',
@@ -201,7 +201,7 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(os.path.dirname(BASE_DIR), "logs/meiduo.log"),  # 日志文件的位置
+            'filename': os.path.join(os.path.abspath(BASE_DIR), "logs/meiduo.log"),  # 日志文件的位置
             'maxBytes': 300 * 1024 * 1024,
             'backupCount': 10,
             'formatter': 'verbose'

@@ -5,7 +5,7 @@ from itsdangerous import BadData
 from django.conf import settings # 导入当前项目中的配置信息
 
 from apps.users import constants
-from meiMall.utils.models import BaseModel
+from utils.models import BaseModel
 
 # Create your models here.
 
