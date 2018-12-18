@@ -49,10 +49,13 @@ INSTALLED_APPS = [
 
     # 注册rest_framework应用
     'rest_framework',
-    'corsheaders',
+    'corsheaders',  # 跨域
+
 ]
 
 MIDDLEWARE = [
+    # 允许其他域下的前端访问我们当前Django项目，这个中间件必须放在第一个位置
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -61,7 +64,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-# CORS[访问当前Django项目的前端域]
+# CORS[访问当前Django项目的前端域]与之相对应的中间件CorsMiddleware和应用corsheaders
 CORS_ORIGIN_WHITELIST = (
     '127.0.0.1:8080',
     'localhost:8080',
