@@ -4,6 +4,8 @@ import re
 
 from rest_framework.settings import api_settings
 
+from apps.users.models import User
+
 
 class CreateUserSerializer(serializers.ModelSerializer):
     """创建用户序列化器"""
@@ -67,6 +69,29 @@ class CreateUserSerializer(serializers.ModelSerializer):
         user.token = token
 
         return user
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'password', 'password2', 'sms_code', 'mobile', 'allow',"token")
+        extra_kwargs = {
+            'id': {'read_only': True},
+            'username': {
+                'min_length': 5,
+                'max_length': 20,
+                'error_messages': {
+                    'min_length': '仅允许5-20个字符的用户名',
+                    'max_length': '仅允许5-20个字符的用户名',
+                }
+            },
+            'password': {
+                'write_only': True,
+                'min_length': 8,
+                'max_length': 20,
+                'error_messages': {
+                    'min_length': '仅允许8-20个字符的密码',
+                    'max_length': '仅允许8-20个字符的密码',
+                }
+            }
+        }
 
 
 
