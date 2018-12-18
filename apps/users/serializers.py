@@ -2,6 +2,8 @@ from django_redis import get_redis_connection
 from rest_framework import serializers
 import re
 
+from rest_framework.settings import api_settings
+
 
 class CreateUserSerializer(serializers.ModelSerializer):
     """创建用户序列化器"""
@@ -38,6 +40,33 @@ class CreateUserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('短信验证码错误')
 
         return data
+
+    def create(self, validated_data):
+        """创建用户"""
+        # 移除数据库模型类中不存在的属性
+        del validated_data['password2']
+        del validated_data['sms_code']
+        del validated_data['allow']
+        # User.objects.create()
+        user = super().create(validated_data)
+
+        # 调用django的认证系统加密密码
+        user.set_password(validated_data['password'])
+        user.save()
+
+        # 调用jwt生成一个token,保存到用户模型中
+        jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER  # 载荷相关配置
+        jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER  # token配置
+
+        # 生成载荷
+        payload = jwt_payload_handler(user)
+        # 生成token
+        token = jwt_encode_handler(payload)
+
+        # 把token放发哦user模型对象
+        user.token = token
+
+        return user
 
 
 

@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
-
+import datetime
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -234,6 +234,21 @@ LOGGING = {
 REST_FRAMEWORK = {
     # 指定异常处理的函数
     'EXCEPTION_HANDLER': 'utils.exceptions.exception_handler',
+    # 设置reset_framework中新增jwt认证机制
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        # JSONWebTokenAuthentication 就是 安装模块中自带
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        # 原来rest框架中自带
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+}
+
+JWT_AUTH = {
+    # jwt生成token的有效期,一天
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),
+    # 设置jwt返回的数据
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'users.utils.jwt_response_payload_handler',
 }
 
 # 修改默认配置的用户模型类
