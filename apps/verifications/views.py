@@ -9,8 +9,8 @@ import random
 
 from apps.verifications.serializers import ImageCodeCheckSerializer
 from libs.captcha.captcha import captcha
-from libs.yuntongxun.sms import CCP
 from . import constants
+from celery_tasks.sms.tasks import send_sms_code
 
 # /image_code/uuid
 class ImageCodeView(APIView):
@@ -63,6 +63,11 @@ class SMSCodeView(GenericAPIView):
         # ccp = CCP()
         # time = str(constants.SMS_CODE_REDIS_EXPIRES/60)
         # ccp.send_template_sms(mobile, [sms_code, time], constants.SMS_TEMP_ID)
+
+        # 调用celery异步发送短信,异步任务函数中的参数, 必须一一按照顺序填写delay中
+        send_sms_code.delay(mobile, sms_code)
+
+
 
         # 5. 返回响应
         return Response({"message": "OK"}, status.HTTP_200_OK)
