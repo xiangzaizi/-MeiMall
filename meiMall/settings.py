@@ -253,3 +253,8 @@ JWT_AUTH = {
 
 # 修改默认配置的用户模型类
 AUTH_USER_MODEL = 'users.User'
+
+# 重新设置了用户认证模型类判断用户名和密码的方法
+AUTHENTICATION_BACKENDS = [
+    'apps.users.utils.UsernameMobileAuthBackend',
+]
