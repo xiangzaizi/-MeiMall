@@ -52,6 +52,10 @@ class ImageCodeCheckSerializer(serializers.Serializer):
         # 没有send_flag_<mobile> = None, 表示60s内内没有发过
         # 默认情况下,attrs获取到的是query_params
         # 在序列化器中可以通过, self.context["view"].kwargs["变量名"] 提起视图信息
+
+        # 此处两个校验: 注册验证码获取 + 通过手机号码和验证码获取发送短信的access_token
+        # 之前是context['view'].kwargs['mobile']
+        # 修改后:context['view'].kwargs.get('mobile')避免报错
         mobile = self.context['view'].kwargs.get('mobile')
         if mobile:
             send_flag = redis_conn.get('send_flag_%s' % mobile)
