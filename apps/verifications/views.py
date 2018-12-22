@@ -7,7 +7,7 @@ from django_redis import get_redis_connection
 from rest_framework import status
 import random
 
-from apps.verifications.serializers import ImageCodeCheckSerializer
+from apps.verifications.serializers import ImageCodeCheckSerializer, CheckAccessTokenForSMSSerializer
 from libs.captcha.captcha import captcha
 from . import constants
 from celery_tasks.sms.tasks import send_sms_code
@@ -71,6 +71,36 @@ class SMSCodeView(GenericAPIView):
 
         # 5. 返回响应
         return Response({"message": "OK"}, status.HTTP_200_OK)
+
+
+class SMSCodeByTokenView(GenericAPIView):
+    serializer_class = CheckAccessTokenForSMSSerializer
+    """凭借access_token发送短信验证码"""
+    def get(self, request):
+        # 1.获取序列化器对象
+        serializer = self.get_serializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+
+        # 2. 生成短信验证码
+        sms_code = "%06d" % random.randint(0, 999999)
+
+        # 从序列化器对象中提取手机号
+        mobile = serializer.mobile
+
+        # 3. 保存短信验证码与发送短信记录
+        redis_conn = get_redis_connection('verify_codes')
+
+        pl = redis_conn.pipeline()
+        pl.multi()
+        pl.setex("sms_%s" % mobile, constants.SMS_CODE_REDIS_EXPIRES, sms_code)
+        # 发送短信的标志, 维护60秒
+        pl.setex("send_flag_%s" % mobile, constants.SEND_SMS_CODE_INTERVAL, 1)
+        pl.execute()  # 把上面组装的操作一并执行
+        # 4. 调用celery异步发送短信, 异步任务函数中的参数, 必须一一按照顺序写到delay中
+        send_sms_code.delay(mobile, sms_code)
+        # 5. 返回响应
+        return Response({'message': "OK"}, status.HTTP_200_OK)
+
 
 
 
